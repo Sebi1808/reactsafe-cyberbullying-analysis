@@ -1,4 +1,6 @@
 import { comments, strategies, responses, type Comment, type InsertComment, type Strategy, type Response, type InsertResponse, type AnalysisResult } from "@shared/schema";
+import { db } from "./db";
+import { eq, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // Comments
@@ -16,166 +18,174 @@ export interface IStorage {
   getResponsesByComment(commentId: number): Promise<Response[]>;
 }
 
-export class MemStorage implements IStorage {
-  private comments: Map<number, Comment>;
-  private strategies: Map<number, Strategy>;
-  private responses: Map<number, Response>;
-  private currentCommentId: number;
-  private currentResponseId: number;
+export class DatabaseStorage implements IStorage {
+  private initialized = false;
 
   constructor() {
-    this.comments = new Map();
-    this.strategies = new Map();
-    this.responses = new Map();
-    this.currentCommentId = 1;
-    this.currentResponseId = 1;
-    
-    // Initialize predefined strategies
-    this.initializeStrategies();
+    // Initialize predefined strategies in database asynchronously
+    this.ensureInitialized();
   }
 
-  private initializeStrategies() {
-    const predefinedStrategies: Omit<Strategy, 'id'>[] = [
-      {
-        name: "Deeskalation",
-        description: "Beruhigt die Situation und reduziert Spannungen durch ruhige, verständnisvolle Kommunikation.",
-        icon: "🕊️",
-        category: "defensive",
-        pros: ["Vermeidet weitere Eskalation", "Professionelle Reaktion", "Bewahrt Ruhe"],
-        cons: ["Könnte als Schwäche interpretiert werden", "Langsamere Konfliktlösung"],
-        riskLevel: "low"
-      },
-      {
-        name: "Ignorieren",
-        description: "Keine Reaktion zeigen und dem Angreifer ins Leere laufen lassen.",
-        icon: "🚫",
-        category: "passive",
-        pros: ["Entzieht Aufmerksamkeit", "Vermeidet Eskalation", "Emotionale Distanz"],
-        cons: ["Könnte Verhalten verstärken", "Keine Problemlösung", "Mögliche Eskalation"],
-        riskLevel: "medium"
-      },
-      {
-        name: "Direkte Konfrontation",
-        description: "Klare Grenzen setzen und sich selbstbewusst zur Wehr setzen.",
-        icon: "⚔️",
-        category: "assertive",
-        pros: ["Klare Kommunikation", "Setzt Grenzen", "Zeigt Stärke"],
-        cons: ["Kann Konflikt verstärken", "Erhöhte Emotionalität", "Unvorhersagbare Reaktion"],
-        riskLevel: "high"
-      },
-      {
-        name: "Dokumentieren",
-        description: "Screenshots und Beweise sammeln für spätere rechtliche oder disziplinarische Schritte.",
-        icon: "📝",
-        category: "informative",
-        pros: ["Rechtliche Absicherung", "Professioneller Ansatz", "Langfristige Lösung"],
-        cons: ["Keine sofortige Hilfe", "Zeitaufwendig", "Erfordert Mut"],
-        riskLevel: "low"
-      },
-      {
-        name: "Hilfe holen",
-        description: "Vertrauenspersonen, Beratungsstellen oder Autoritäten um Unterstützung bitten.",
-        icon: "🆘",
-        category: "supportive",
-        pros: ["Professionelle Unterstützung", "Geteilte Verantwortung", "Expertise"],
-        cons: ["Abhängigkeit von anderen", "Mögliche Verzögerung", "Verlust der Kontrolle"],
-        riskLevel: "low"
-      },
-      {
-        name: "Humor/Deflection",
-        description: "Mit Humor oder Ironie antworten um die Situation zu entschärfen.",
-        icon: "😄",
-        category: "deflective",
-        pros: ["Entschärft Situation", "Zeigt Gelassenheit", "Kann Sympathie erzeugen"],
-        cons: ["Kann missverstanden werden", "Risiko der Verharmlosung", "Timing wichtig"],
-        riskLevel: "medium"
-      },
-      {
-        name: "Sachliche Korrektur",
-        description: "Faktische Fehler korrigieren ohne emotional zu werden.",
-        icon: "✅",
-        category: "informative",
-        pros: ["Stellt Fakten klar", "Professionell", "Bildend"],
-        cons: ["Kann als belehrend wirken", "Ignoriert emotionale Ebene", "Möglicherweise wirkungslos"],
-        riskLevel: "low"
-      },
-      {
-        name: "Empathische Reaktion",
-        description: "Verständnis für mögliche Gründe des Verhaltens zeigen.",
-        icon: "❤️",
-        category: "empathetic",
-        pros: ["Zeigt Menschlichkeit", "Kann Aggression reduzieren", "Fördert Dialog"],
-        cons: ["Kann als Schwäche interpretiert werden", "Rechtfertigt möglicherweise Verhalten", "Emotional belastend"],
-        riskLevel: "low"
-      }
-    ];
+  private async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initializeStrategies();
+      this.initialized = true;
+    }
+  }
 
-    predefinedStrategies.forEach((strategy, index) => {
-      const strategyWithId: Strategy = { ...strategy, id: index + 1 };
-      this.strategies.set(strategyWithId.id, strategyWithId);
-    });
+  private async initializeStrategies() {
+    try {
+      // Check if strategies already exist
+      const existingStrategies = await db.select().from(strategies).limit(1);
+      if (existingStrategies.length > 0) {
+        return; // Strategies already initialized
+      }
+
+      const predefinedStrategies = [
+        {
+          name: "Deeskalation",
+          description: "Beruhigt die Situation und reduziert Spannungen durch ruhige, verständnisvolle Kommunikation.",
+          icon: "🕊️",
+          category: "defensive",
+          pros: ["Vermeidet weitere Eskalation", "Professionelle Reaktion", "Bewahrt Ruhe"],
+          cons: ["Könnte als Schwäche interpretiert werden", "Langsamere Konfliktlösung"],
+          riskLevel: "low"
+        },
+        {
+          name: "Ignorieren",
+          description: "Keine Reaktion zeigen und dem Angreifer ins Leere laufen lassen.",
+          icon: "🚫",
+          category: "passive",
+          pros: ["Entzieht Aufmerksamkeit", "Vermeidet Eskalation", "Emotionale Distanz"],
+          cons: ["Könnte Verhalten verstärken", "Keine Problemlösung", "Mögliche Eskalation"],
+          riskLevel: "medium"
+        },
+        {
+          name: "Direkte Konfrontation",
+          description: "Klare Grenzen setzen und sich selbstbewusst zur Wehr setzen.",
+          icon: "⚔️",
+          category: "assertive",
+          pros: ["Klare Kommunikation", "Setzt Grenzen", "Zeigt Stärke"],
+          cons: ["Kann Konflikt verstärken", "Erhöhte Emotionalität", "Unvorhersagbare Reaktion"],
+          riskLevel: "high"
+        },
+        {
+          name: "Dokumentieren",
+          description: "Screenshots und Beweise sammeln für spätere rechtliche oder disziplinarische Schritte.",
+          icon: "📝",
+          category: "informative",
+          pros: ["Rechtliche Absicherung", "Professioneller Ansatz", "Langfristige Lösung"],
+          cons: ["Keine sofortige Hilfe", "Zeitaufwendig", "Erfordert Mut"],
+          riskLevel: "low"
+        },
+        {
+          name: "Hilfe holen",
+          description: "Vertrauenspersonen, Beratungsstellen oder Autoritäten um Unterstützung bitten.",
+          icon: "🆘",
+          category: "supportive",
+          pros: ["Professionelle Unterstützung", "Geteilte Verantwortung", "Expertise"],
+          cons: ["Abhängigkeit von anderen", "Mögliche Verzögerung", "Verlust der Kontrolle"],
+          riskLevel: "low"
+        },
+        {
+          name: "Humor/Deflection",
+          description: "Mit Humor oder Ironie antworten um die Situation zu entschärfen.",
+          icon: "😄",
+          category: "deflective",
+          pros: ["Entschärft Situation", "Zeigt Gelassenheit", "Kann Sympathie erzeugen"],
+          cons: ["Kann missverstanden werden", "Risiko der Verharmlosung", "Timing wichtig"],
+          riskLevel: "medium"
+        },
+        {
+          name: "Sachliche Korrektur",
+          description: "Faktische Fehler korrigieren ohne emotional zu werden.",
+          icon: "✅",
+          category: "informative",
+          pros: ["Stellt Fakten klar", "Professionell", "Bildend"],
+          cons: ["Kann als belehrend wirken", "Ignoriert emotionale Ebene", "Möglicherweise wirkungslos"],
+          riskLevel: "low"
+        },
+        {
+          name: "Empathische Reaktion",
+          description: "Verständnis für mögliche Gründe des Verhaltens zeigen.",
+          icon: "❤️",
+          category: "empathetic",
+          pros: ["Zeigt Menschlichkeit", "Kann Aggression reduzieren", "Fördert Dialog"],
+          cons: ["Kann als Schwäche interpretiert werden", "Rechtfertigt möglicherweise Verhalten", "Emotional belastend"],
+          riskLevel: "low"
+        }
+      ];
+
+      await db.insert(strategies).values(predefinedStrategies);
+      console.log('Strategies initialized in database');
+    } catch (error) {
+      console.error('Failed to initialize strategies:', error);
+    }
   }
 
   async createComment(insertComment: InsertComment): Promise<Comment> {
-    const id = this.currentCommentId++;
-    const comment: Comment = {
-      ...insertComment,
-      id,
-      analysis: null,
-      parameters: insertComment.parameters || null,
-      title: insertComment.title || null,
-      platform: insertComment.platform || null,
-      createdAt: new Date(),
-    };
-    this.comments.set(id, comment);
+    const [comment] = await db
+      .insert(comments)
+      .values({
+        ...insertComment,
+        parameters: insertComment.parameters || null,
+        title: insertComment.title || null,
+        platform: insertComment.platform || null,
+      })
+      .returning();
     return comment;
   }
 
   async getComment(id: number): Promise<Comment | undefined> {
-    return this.comments.get(id);
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    return comment || undefined;
   }
 
   async updateCommentAnalysis(id: number, analysis: AnalysisResult): Promise<Comment> {
-    const comment = this.comments.get(id);
-    if (!comment) {
+    const [updatedComment] = await db
+      .update(comments)
+      .set({ analysis })
+      .where(eq(comments.id, id))
+      .returning();
+    
+    if (!updatedComment) {
       throw new Error(`Comment with id ${id} not found`);
     }
-    const updatedComment: Comment = { ...comment, analysis };
-    this.comments.set(id, updatedComment);
+    
     return updatedComment;
   }
 
   async getAllStrategies(): Promise<Strategy[]> {
-    return Array.from(this.strategies.values());
+    await this.ensureInitialized();
+    return await db.select().from(strategies);
   }
 
   async getStrategy(id: number): Promise<Strategy | undefined> {
-    return this.strategies.get(id);
+    const [strategy] = await db.select().from(strategies).where(eq(strategies.id, id));
+    return strategy || undefined;
   }
 
   async getStrategiesByIds(ids: number[]): Promise<Strategy[]> {
-    return ids.map(id => this.strategies.get(id)).filter(Boolean) as Strategy[];
+    if (ids.length === 0) return [];
+    return await db.select().from(strategies).where(inArray(strategies.id, ids));
   }
 
   async createResponse(insertResponse: InsertResponse): Promise<Response> {
-    const id = this.currentResponseId++;
-    const response: Response = {
-      ...insertResponse,
-      id,
-      context: insertResponse.context || null,
-      commentId: insertResponse.commentId || null,
-      strategyId: insertResponse.strategyId || null,
-      createdAt: new Date(),
-    };
-    this.responses.set(id, response);
+    const [response] = await db
+      .insert(responses)
+      .values({
+        ...insertResponse,
+        context: insertResponse.context || null,
+        commentId: insertResponse.commentId || null,
+        strategyId: insertResponse.strategyId || null,
+      })
+      .returning();
     return response;
   }
 
   async getResponsesByComment(commentId: number): Promise<Response[]> {
-    return Array.from(this.responses.values()).filter(
-      (response) => response.commentId === commentId
-    );
+    return await db.select().from(responses).where(eq(responses.commentId, commentId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
