@@ -38,27 +38,56 @@ export default function LinguisticAnalysisDisplay({ analysis }: LinguisticAnalys
           <AccordionItem value="pragmatic">
             <AccordionTrigger className="flex items-center space-x-2">
               <MessageSquare className="w-4 h-4" />
-              <span>Pragmatische Ebene</span>
+              <span>Pragmatische Ebene (Austin/Searle/Grice)</span>
               <Badge className={getRiskColor(linguisticAnalysis.pragmatic.faceThreat)}>
                 Face-Threat: {linguisticAnalysis.pragmatic.faceThreat}
               </Badge>
             </AccordionTrigger>
             <AccordionContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium mb-2">Sprechakte (Searle):</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {linguisticAnalysis.pragmatic.speechActs.map((act: string, index: number) => (
+                      <Badge key={index} variant="destructive">{act}</Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Grice'sche Maximen-Verletzungen:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {(linguisticAnalysis.pragmatic.griceMaxims || []).map((maxim: string, index: number) => (
+                      <Badge key={index} variant="outline">{maxim}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
               <div>
-                <h4 className="font-medium mb-2">Sprechakte:</h4>
+                <h4 className="font-medium mb-2">Höflichkeitsstrategien (Brown/Levinson):</h4>
                 <div className="flex flex-wrap gap-1">
-                  {linguisticAnalysis.pragmatic.speechActs.map((act: string, index: number) => (
-                    <Badge key={index} variant="outline">{act}</Badge>
+                  {(linguisticAnalysis.pragmatic.politenessStrategies || []).map((strategy: string, index: number) => (
+                    <Badge key={index} variant="secondary">{strategy}</Badge>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Deixis-Analyse:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {(linguisticAnalysis.pragmatic.deixis || []).map((deixis: string, index: number) => (
+                    <Badge key={index} variant="outline">{deixis}</Badge>
                   ))}
                 </div>
               </div>
               
               {linguisticAnalysis.pragmatic.implicatures.length > 0 && (
                 <div>
-                  <h4 className="font-medium mb-2">Implizite Botschaften:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
+                  <h4 className="font-medium mb-2">Konversationale Implikaturen:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm bg-red-50 p-3 rounded">
                     {linguisticAnalysis.pragmatic.implicatures.map((imp: string, index: number) => (
-                      <li key={index}>{imp}</li>
+                      <li key={index} className="text-red-800">{imp}</li>
                     ))}
                   </ul>
                 </div>
@@ -66,10 +95,10 @@ export default function LinguisticAnalysisDisplay({ analysis }: LinguisticAnalys
               
               {linguisticAnalysis.pragmatic.presuppositions.length > 0 && (
                 <div>
-                  <h4 className="font-medium mb-2">Voraussetzungen:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
+                  <h4 className="font-medium mb-2">Pragmatische Präsuppositionen:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm bg-yellow-50 p-3 rounded">
                     {linguisticAnalysis.pragmatic.presuppositions.map((pres: string, index: number) => (
-                      <li key={index}>{pres}</li>
+                      <li key={index} className="text-yellow-800">{pres}</li>
                     ))}
                   </ul>
                 </div>
@@ -211,12 +240,37 @@ export default function LinguisticAnalysisDisplay({ analysis }: LinguisticAnalys
             <AccordionTrigger className="flex items-center space-x-2">
               <Heart className="w-4 h-4" />
               <span>Psycholinguistische Wirkung</span>
+              <Badge variant="outline">
+                Arousal: {linguisticAnalysis.psycholinguistic.arousalLevel || 'unbekannt'}
+              </Badge>
             </AccordionTrigger>
             <AccordionContent className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">Emotionale Auswirkung:</h4>
                 <p className="text-sm bg-red-50 p-2 rounded text-red-800">{linguisticAnalysis.psycholinguistic.emotionalImpact}</p>
               </div>
+              
+              {(linguisticAnalysis.psycholinguistic.cognitiveDistortions || []).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Kognitive Verzerrungen:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {linguisticAnalysis.psycholinguistic.cognitiveDistortions.map((distortion: string, index: number) => (
+                      <Badge key={index} variant="destructive">{distortion}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {(linguisticAnalysis.psycholinguistic.persuasionStrategies || []).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Persuasionsstrategien (Ethos/Pathos/Logos):</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {linguisticAnalysis.psycholinguistic.persuasionStrategies.map((strategy: string, index: number) => (
+                      <Badge key={index} variant="outline">{strategy}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               {linguisticAnalysis.psycholinguistic.manipulationTactics.length > 0 && (
                 <div>
@@ -235,6 +289,53 @@ export default function LinguisticAnalysisDisplay({ analysis }: LinguisticAnalys
                   <div className="flex flex-wrap gap-1">
                     {linguisticAnalysis.psycholinguistic.identityThreats.map((threat: string, index: number) => (
                       <Badge key={index} variant="destructive">{threat}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Soziolinguistische Dimensionen */}
+          <AccordionItem value="sociolinguistic">
+            <AccordionTrigger className="flex items-center space-x-2">
+              <Users className="w-4 h-4" />
+              <span>Soziolinguistische Dimensionen</span>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Machtbeziehungen:</h4>
+                <p className="text-sm bg-gray-50 p-2 rounded">{(linguisticAnalysis as any).sociolinguistic?.powerRelations || 'Keine Analyse verfügbar'}</p>
+              </div>
+              
+              {((linguisticAnalysis as any).sociolinguistic?.registerShifts || []).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Register-Wechsel:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {(linguisticAnalysis as any).sociolinguistic.registerShifts.map((shift: string, index: number) => (
+                      <Badge key={index} variant="outline">{shift}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {((linguisticAnalysis as any).sociolinguistic?.socialMarkers || []).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Soziale Markierungen:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {(linguisticAnalysis as any).sociolinguistic.socialMarkers.map((marker: string, index: number) => (
+                      <Badge key={index} variant="secondary">{marker}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {((linguisticAnalysis as any).sociolinguistic?.culturalNorms || []).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Kulturelle Normen:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {(linguisticAnalysis as any).sociolinguistic.culturalNorms.map((norm: string, index: number) => (
+                      <Badge key={index} variant="outline">{norm}</Badge>
                     ))}
                   </div>
                 </div>

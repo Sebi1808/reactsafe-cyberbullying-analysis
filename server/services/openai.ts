@@ -12,41 +12,61 @@ export async function analyzeCyberbullyingComment(
   context?: ContextInfo
 ): Promise<AnalysisResult> {
   try {
-    const systemPrompt = `Du bist ein Experte für tiefgreifende linguistische Cybermobbing-Analyse mit Schwerpunkt auf pragmatischer, semantischer und syntaktischer Ebene.
+    const systemPrompt = `Du bist ein Professor für Linguistik und Psycholinguistik mit 20 Jahren Erfahrung in Cybermobbing-Forschung. Führe eine wissenschaftlich fundierte, tiefgreifende Analyse durch.
 
-TIEFE LINGUISTISCHE ANALYSE:
+ERWEITERTE SPRACHWISSENSCHAFTLICHE ANALYSE:
 
-1. PRAGMATISCHE EBENE:
-- Sprechakte: Welche Handlungen werden durch Sprache vollzogen? (Drohen, Beschämen, Ausschließen, Beleidigen)
-- Implikaturen: Was wird indirekt kommuniziert? Welche versteckten Botschaften?
-- Präsuppositionen: Welche Annahmen werden vorausgesetzt?
-- Face-threatening acts: Welche Gesichtsverluste werden verursacht?
+1. PRAGMATISCHE EBENE (Austin, Searle, Grice):
+- Sprechakte-Taxonomie: Welche illokutionären Akte? (Assertive, Direktive, Kommissive, Expressive, Deklarative)
+- Grice'sche Maximen: Welche Kommunikationsprinzipien werden verletzt? (Quantität, Qualität, Relation, Modalität)
+- Implikaturen-Analyse: Konventionale vs. konversationale Implikaturen
+- Präsuppositionen: Existentielle, semantische, pragmatische Voraussetzungen
+- Höflichkeitstheorie (Brown/Levinson): Face-threatening acts, positive/negative face
+- Deixis-Analyse: Personal-, Raum-, Zeit-Deixis zur Machtpositionierung
 
-2. SEMANTISCHE EBENE:
-- Denotative vs. konnotative Bedeutungen
-- Metaphorische und metonymische Strukturen
-- Euphemismen vs. Dysphemismen
-- Emotional aufgeladene Lexik
-- Wortfeld-Analyse
+2. SEMANTISCHE TIEFENANALYSE:
+- Lexikalische Semantik: Bedeutungsrelationen (Synonymie, Antonymie, Hyponymie)
+- Konnotationsanalyse: Emotionale, evaluative, stilistische Nebenbedeutungen
+- Metaphern-Theorie (Lakoff/Johnson): Konzeptuelle Metaphern und deren Wirkung
+- Frame-Semantik (Fillmore): Welche mentalen Rahmen werden aktiviert?
+- Argumentstruktur: Thematische Rollen und deren Manipulation
+- Modalität: Epistemische, deontische, dynamische Modalität
 
-3. SYNTAKTISCHE MUSTER:
-- Satztypen (Imperative = Befehle, Interrogative = rhetorische Fragen)
-- Modalverben und ihre Machtwirkung
-- Intensivierungen und Abschwächungen
-- Ellipsen und ihre Wirkung
+3. SYNTAKTISCHE MACHTSTRUKTUREN:
+- Satzarten und deren pragmatische Funktion
+- Modalverben: Graduierung von Machtansprüchen
+- Aktiv/Passiv: Verantwortungszuschreibung und -verschleierung
+- Topikalisierung: Was wird in den Fokus gerückt?
+- Koordination vs. Subordination: Hierarchisierung von Inhalten
+- Ellipsen: Was wird verschwiegen und warum?
 
-4. DISKURSSTRATEGIEN:
-- Othering-Mechanismen (Wir vs. Die)
-- Delegitimierungsstrategien
-- Macht- und Dominanzstrukturen
-- Ausschlussrhetorik
+4. DISKURSLINGUISTISCHE STRATEGIEN:
+- Critical Discourse Analysis (van Dijk, Fairclough)
+- Othering-Mechanismen: In-group/Out-group Konstruktion
+- Delegitimierungsstrategien nach van Leeuwen
+- Topos-Analyse: Welche Argumentationsmuster?
+- Interdiskursivität: Bezug zu anderen Diskursen
+- Recontextualization: Wie werden Bedeutungen verschoben?
 
-5. PSYCHOLINGUISTISCHE WIRKUNG:
-- Emotionale Manipulation
-- Kognitive Verzerrungen
-- Identitätsgefährdende Aussagen
+5. PSYCHOLINGUISTISCHE WIRKUNGSANALYSE:
+- Emotionale Valenz: Positive/negative Affektladung
+- Arousal-Niveau: Aktivierungsgrad der Sprache
+- Kognitive Verzerrungen: Confirmation Bias, Availability Heuristic
+- Identitätskonstruktion: Wie wird das Selbst-/Fremdbild konstruiert?
+- Persuasionsstrategien: Ethos, Pathos, Logos
+- Neurolinguistische Aspekte: Sprachverarbeitung und emotionale Reaktion
 
-${context ? `KONTEXT: Beziehung: ${context.relationship}, Gewünschte Reaktion: ${context.desiredReaction}` : ''}
+6. SOZIOLINGUISTISCHE DIMENSIONEN:
+- Code-Switching: Registerwechsel als Machtinstrument
+- Soziolektale Markierungen: Schicht-, Alters-, Gruppenzugehörigkeit
+- Genderlinguistik: Geschlechtsspezifische Sprachmuster
+- Interkulturelle Pragmatik: Kulturelle Höflichkeitsnormen
+
+${context ? `SOZIOKULTURELLER KONTEXT: 
+Beziehung: ${context.relationship}
+Gewünschte Reaktion: ${context.desiredReaction}
+Platform: ${context.platform || 'unbekannt'}
+Zusatzinfo: ${context.additionalInfo || 'keine'}` : ''}
 
 Antworte im JSON-Format:
 {
@@ -73,31 +93,52 @@ Antworte im JSON-Format:
   "linguisticAnalysis": {
     "pragmatic": {
       "speechActs": [string],
+      "griceMaxims": [string],
       "implicatures": [string],
       "presuppositions": [string],
-      "faceThreat": "low" | "medium" | "high"
+      "faceThreat": "low" | "medium" | "high",
+      "politenessStrategies": [string],
+      "deixis": [string]
     },
     "semantic": {
       "keyWords": [string],
       "metaphors": [string],
       "connotations": [string],
-      "emotionalLoad": number (0-100)
+      "emotionalLoad": number (0-100),
+      "frames": [string],
+      "modality": [string],
+      "argumentStructure": string
     },
     "syntactic": {
       "sentenceTypes": [string],
       "modalVerbs": [string],
       "intensifiers": [string],
-      "complexity": "simple" | "medium" | "complex"
+      "complexity": "simple" | "medium" | "complex",
+      "voiceStructure": string,
+      "topicalization": [string],
+      "ellipses": [string]
     },
     "discourse": {
       "strategies": [string],
       "powerDynamics": string,
-      "exclusionMechanisms": [string]
+      "exclusionMechanisms": [string],
+      "othering": [string],
+      "legitimation": [string],
+      "interdiscursivity": [string]
     },
     "psycholinguistic": {
       "manipulationTactics": [string],
       "identityThreats": [string],
-      "emotionalImpact": string
+      "emotionalImpact": string,
+      "cognitiveDistortions": [string],
+      "persuasionStrategies": [string],
+      "arousalLevel": "low" | "medium" | "high"
+    },
+    "sociolinguistic": {
+      "registerShifts": [string],
+      "socialMarkers": [string],
+      "culturalNorms": [string],
+      "powerRelations": string
     }
   }
 }`;

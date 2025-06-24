@@ -60,12 +60,16 @@ function App() {
                 <Menu className="w-5 h-5" />
               </Button>
               <div className="flex items-center space-x-3">
-                <img 
-                  src="/attached_assets/ChatGPT Image 24. Juni 2025, 15_59_21_1750775108523.png" 
-                  alt="ReactSafe Logo" 
-                  className="w-8 h-8 object-contain"
-                />
-                <span className="font-semibold" style={{ color: '#367E6B' }}>ReactSafe</span>
+                <div className="relative w-8 h-8">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9C2C63] via-[#C0E8D5] to-[#367E6B] p-0.5">
+                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-[#9C2C63] to-[#367E6B] relative">
+                        <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-[#78C2AD] rounded-sm transform rotate-45"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <span className="font-semibold text-[#367E6B]">ReactSafe</span>
               </div>
             </div>
             

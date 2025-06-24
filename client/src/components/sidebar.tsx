@@ -39,14 +39,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex items-center space-x-3 p-6 border-b border-gray-100">
           <div className="flex items-center space-x-3">
             <div className="relative w-10 h-10">
-              <img 
-                src="/attached_assets/ChatGPT Image 24. Juni 2025, 15_59_21_1750775108523.png" 
-                alt="ReactSafe Logo" 
-                className="w-10 h-10 object-contain"
-              />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9C2C63] via-[#C0E8D5] to-[#367E6B] p-0.5">
+                <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                  <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-[#9C2C63] to-[#367E6B] relative">
+                    <div className="absolute top-0 right-0 w-2 h-2 bg-[#78C2AD] rounded-sm transform rotate-45"></div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div>
-              <h1 className="text-lg font-semibold" style={{ color: '#367E6B' }}>ReactSafe</h1>
+              <h1 className="text-lg font-semibold text-[#367E6B]">ReactSafe</h1>
               <p className="text-xs text-gray-500">AI-Powered Protection</p>
             </div>
           </div>
