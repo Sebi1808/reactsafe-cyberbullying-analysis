@@ -1,16 +1,45 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  jsonb,
+  index,
+  serial,
+  integer,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for Replit Auth
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
-  analysis: jsonb("analysis"),
-  mode: text("mode").notNull(), // 'manual' | 'autopilot'
-  parameters: jsonb("parameters"),
-  title: text("title"),
-  platform: text("platform"), // 'instagram', 'twitter', 'facebook', etc.
+  userId: varchar("user_id"),
+  analysisResult: jsonb("analysis_result").$type<AnalysisResult>(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const strategies = pgTable("strategies", {
@@ -33,14 +62,13 @@ export const responses = pgTable("responses", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Zod schemas
 export const insertCommentSchema = createInsertSchema(comments).pick({
   content: true,
-  mode: true,
-  parameters: true,
-  title: true,
-  platform: true,
+  userId: true,
 });
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
 
 export const insertResponseSchema = createInsertSchema(responses).pick({
   commentId: true,
@@ -48,6 +76,12 @@ export const insertResponseSchema = createInsertSchema(responses).pick({
   generatedText: true,
   context: true,
 });
+
+export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type Comment = typeof comments.$inferSelect;
+export type InsertResponse = z.infer<typeof insertResponseSchema>;
+export type Response = typeof responses.$inferSelect;
+export type Strategy = typeof strategies.$inferSelect;
 
 // Analysis parameters schema
 export const analysisParametersSchema = z.object({

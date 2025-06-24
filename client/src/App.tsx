@@ -13,15 +13,44 @@ import HistoryPage from "@/pages/history";
 import StrategiesPage from "@/pages/strategies";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
+import LandingPage from "@/pages/landing";
+import { useAuth } from "@/hooks/useAuth";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9C2C63] via-[#C0E8D5] to-[#367E6B] p-0.5 animate-pulse">
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                <div className="w-6 h-6 rounded-sm bg-gradient-to-br from-[#9C2C63] to-[#367E6B] relative">
+                  <div className="absolute top-0 right-0 w-3 h-3 bg-[#78C2AD] rounded-sm transform rotate-45"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-600">ReactSafe wird geladen...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/analyze" component={AnalyzePage} />
-      <Route path="/history" component={HistoryPage} />
-      <Route path="/strategies" component={StrategiesPage} />
-      <Route path="/settings" component={SettingsPage} />
+      {!isAuthenticated ? (
+        <Route path="/" component={LandingPage} />
+      ) : (
+        <>
+          <Route path="/" component={Dashboard} />
+          <Route path="/analyze" component={AnalyzePage} />
+          <Route path="/history" component={HistoryPage} />
+          <Route path="/strategies" component={StrategiesPage} />
+          <Route path="/settings" component={SettingsPage} />
+        </>
+      )}
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,8 +1,25 @@
-import { comments, strategies, responses, type Comment, type InsertComment, type Strategy, type Response, type InsertResponse, type AnalysisResult } from "@shared/schema";
+import { 
+  users,
+  comments, 
+  strategies, 
+  responses, 
+  type User,
+  type UpsertUser,
+  type Comment, 
+  type InsertComment, 
+  type Strategy, 
+  type Response, 
+  type InsertResponse, 
+  type AnalysisResult 
+} from "@shared/schema";
 import { db } from "./db";
 import { eq, inArray } from "drizzle-orm";
 
 export interface IStorage {
+  // User operations (for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
   getComment(id: number): Promise<Comment | undefined>;
@@ -16,6 +33,10 @@ export interface IStorage {
   // Responses
   createResponse(response: InsertResponse): Promise<Response>;
   getResponsesByComment(commentId: number): Promise<Response[]>;
+  
+  // User history
+  getUserHistory(userId: string): Promise<any[]>;
+  getUserStats(userId: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -144,7 +165,7 @@ export class DatabaseStorage implements IStorage {
   async updateCommentAnalysis(id: number, analysis: AnalysisResult): Promise<Comment> {
     const [updatedComment] = await db
       .update(comments)
-      .set({ analysis })
+      .set({ analysisResult: analysis })
       .where(eq(comments.id, id))
       .returning();
     
@@ -185,6 +206,62 @@ export class DatabaseStorage implements IStorage {
 
   async getResponsesByComment(commentId: number): Promise<Response[]> {
     return await db.select().from(responses).where(eq(responses.commentId, commentId));
+  }
+
+  // User operations (for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    await this.ensureInitialized();
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    await this.ensureInitialized();
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async getUserHistory(userId: string): Promise<any[]> {
+    await this.ensureInitialized();
+    const userComments = await db.select().from(comments).where(eq(comments.userId, userId));
+    return userComments.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      riskLevel: comment.analysisResult?.riskLevel || 'unknown',
+      riskScore: comment.analysisResult?.riskScore || 0,
+      platform: 'ReactSafe',
+      date: comment.createdAt,
+      strategiesUsed: comment.analysisResult?.recommendedStrategies?.length || 0
+    }));
+  }
+
+  async getUserStats(userId: string): Promise<any> {
+    await this.ensureInitialized();
+    const userComments = await db.select().from(comments).where(eq(comments.userId, userId));
+    
+    const totalAnalyses = userComments.length;
+    const averageRiskScore = totalAnalyses > 0 
+      ? userComments.reduce((sum, comment) => sum + (comment.analysisResult?.riskScore || 0), 0) / totalAnalyses 
+      : 0;
+    const highRiskCount = userComments.filter(comment => comment.analysisResult?.riskLevel === 'high').length;
+    const strategiesUsed = userComments.reduce((sum, comment) => sum + (comment.analysisResult?.recommendedStrategies?.length || 0), 0);
+
+    return {
+      totalAnalyses,
+      averageRiskScore: Math.round(averageRiskScore * 10) / 10,
+      highRiskCount,
+      strategiesUsed
+    };
   }
 }
 

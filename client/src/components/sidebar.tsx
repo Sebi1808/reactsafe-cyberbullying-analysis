@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Home, History, Settings, HelpCircle, Brain, Zap, BarChart3 } from "lucide-react";
+import { Home, History, Settings, HelpCircle, Brain, Zap, BarChart3, LogOut, X, BookOpen } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
+  const { user } = useAuth();
 
   const menuItems = [
     { icon: Home, label: "Dashboard", path: "/" },

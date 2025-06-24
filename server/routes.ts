@@ -1,11 +1,49 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { analyzeCyberbullyingComment, generateResponse } from "./services/openai";
 import { insertCommentSchema, analysisParametersSchema, contextInfoSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Replit Auth
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // User history routes
+  app.get('/api/history', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const history = await storage.getUserHistory(userId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      res.status(500).json({ message: "Failed to fetch history" });
+    }
+  });
+
+  app.get('/api/history/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const stats = await storage.getUserStats(userId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
   
   // Analyze comment endpoint
   app.post("/api/analyze", async (req, res) => {
@@ -37,10 +75,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create comment record
+      // Get user ID if authenticated
+      const userId = (req as any).user?.claims?.sub || null;
+
       const commentData = insertCommentSchema.parse({
         content: comment,
-        mode: mode || 'manual',
-        parameters: validatedParameters,
+        userId: userId,
       });
 
       const createdComment = await storage.createComment(commentData);
