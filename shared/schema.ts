@@ -8,6 +8,8 @@ export const comments = pgTable("comments", {
   analysis: jsonb("analysis"),
   mode: text("mode").notNull(), // 'manual' | 'autopilot'
   parameters: jsonb("parameters"),
+  title: text("title"),
+  platform: text("platform"), // 'instagram', 'twitter', 'facebook', etc.
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -36,6 +38,8 @@ export const insertCommentSchema = createInsertSchema(comments).pick({
   content: true,
   mode: true,
   parameters: true,
+  title: true,
+  platform: true,
 });
 
 export const insertResponseSchema = createInsertSchema(responses).pick({

@@ -1,144 +1,230 @@
-import { useState } from "react";
-import { Shield, Settings, HelpCircle } from "lucide-react";
-import ModeSelector from "@/components/mode-selector";
-import CommentInput from "@/components/comment-input";
-import ManualParameters from "@/components/manual-parameters";
-import AnalysisResults from "@/components/analysis-results";
-import StrategySelector from "@/components/strategy-selector";
-import ResponseGenerator from "@/components/response-generator";
-import ContextModal from "@/components/context-modal";
-import LoadingIndicator from "@/components/loading-indicator";
-import type { AnalysisParameters, ContextInfo, AnalysisResult, Strategy, Comment } from "@shared/schema";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Brain, TrendingUp, AlertTriangle, Shield, Zap, History, BookOpen } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Dashboard() {
-  const [mode, setMode] = useState<'manual' | 'autopilot'>('manual');
-  const [comment, setComment] = useState('');
-  const [parameters, setParameters] = useState<AnalysisParameters>({
-    severityLevels: ['light', 'medium', 'severe'],
-    categories: ['insult', 'threat', 'discrimination', 'harassment'],
-    context: [],
-  });
-  const [contextInfo, setContextInfo] = useState<ContextInfo | null>(null);
-  const [showContextModal, setShowContextModal] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [analyzedComment, setAnalyzedComment] = useState<Comment | null>(null);
-  const [recommendedStrategies, setRecommendedStrategies] = useState<Strategy[]>([]);
-  const [selectedStrategy, setSelectedStrategy] = useState<Strategy | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleModeChange = (newMode: 'manual' | 'autopilot') => {
-    setMode(newMode);
-    if (newMode === 'autopilot') {
-      setShowContextModal(true);
+  const stats = [
+    {
+      title: "Analysen heute",
+      value: "12",
+      change: "+3",
+      icon: Brain,
+      color: "#9C2C63"
+    },
+    {
+      title: "Risiko-Score Ø",
+      value: "4.2",
+      change: "-0.8",
+      icon: TrendingUp,
+      color: "#78C2AD"
+    },
+    {
+      title: "Hohe Risiken",
+      value: "2",
+      change: "0",
+      icon: AlertTriangle,
+      color: "#ef4444"
+    },
+    {
+      title: "Strategien verwendet",
+      value: "18",
+      change: "+5",
+      icon: Shield,
+      color: "#367E6B"
     }
-    // Reset analysis state when mode changes
-    setAnalysisResult(null);
-    setAnalyzedComment(null);
-    setRecommendedStrategies([]);
-    setSelectedStrategy(null);
+  ];
+
+  const quickActions = [
+    {
+      title: "Neue Analyse",
+      description: "Kommentar sofort analysieren",
+      icon: Brain,
+      path: "/analyze",
+      gradient: "linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)"
+    },
+    {
+      title: "Verlauf ansehen",
+      description: "Frühere Analysen durchsuchen",
+      icon: History,
+      path: "/history",
+      gradient: "linear-gradient(135deg, #367E6B 0%, #78C2AD 100%)"
+    },
+    {
+      title: "Strategien",
+      description: "Alle verfügbaren Strategien",
+      icon: BookOpen,
+      path: "/strategies",
+      gradient: "linear-gradient(135deg, #4B0F2E 0%, #9C2C63 100%)"
+    }
+  ];
+
+  const recentAnalyses = [
+    {
+      id: 1,
+      content: "Du bist so dumm, wie kannst du nur so einen Müll posten?",
+      riskLevel: "high",
+      riskScore: 8.2,
+      platform: "Instagram",
+      time: "vor 2 Stunden"
+    },
+    {
+      id: 2,
+      content: "Schaut mal Vivi an, die denkt sie ist was Besonderes",
+      riskLevel: "medium",
+      riskScore: 6.1,
+      platform: "TikTok",
+      time: "vor 4 Stunden"
+    },
+    {
+      id: 3,
+      content: "Warum postest du solchen Quatsch?",
+      riskLevel: "low",
+      riskScore: 3.5,
+      platform: "Twitter",
+      time: "gestern"
+    }
+  ];
+
+  const getRiskColor = (level: string) => {
+    switch (level) {
+      case 'high': return '#ef4444';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#10b981';
+      default: return '#6b7280';
+    }
   };
 
-  const handleAnalysisComplete = (result: AnalysisResult, comment: Comment, strategies: Strategy[]) => {
-    setAnalysisResult(result);
-    setAnalyzedComment(comment);
-    setRecommendedStrategies(strategies);
-    setIsLoading(false);
+  const getPlatformEmoji = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'instagram': return '📷';
+      case 'tiktok': return '🎵';
+      case 'twitter': return '🐦';
+      case 'facebook': return '👥';
+      default: return '💬';
+    }
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen font-sans">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                <Shield className="text-white w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">CyberGuard</h1>
-                <p className="text-xs text-gray-500">AI-Powered Protection</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <Settings className="text-gray-600 w-5 h-5" />
-              </button>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <HelpCircle className="text-gray-600 w-5 h-5" />
-              </button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#4B0F2E' }}>
+            Willkommen bei ReactSafe
+          </h1>
+          <p className="text-gray-600">
+            Ihre intelligente Lösung für den Umgang mit Cybermobbing
+          </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="space-y-6">
-          {/* Mode Selector */}
-          <ModeSelector 
-            mode={mode} 
-            onModeChange={handleModeChange} 
-          />
-
-          {/* Comment Input */}
-          <CommentInput
-            comment={comment}
-            onCommentChange={setComment}
-            mode={mode}
-            parameters={parameters}
-            contextInfo={contextInfo}
-            onAnalysisStart={() => setIsLoading(true)}
-            onAnalysisComplete={handleAnalysisComplete}
-          />
-
-          {/* Manual Parameters */}
-          {mode === 'manual' && (
-            <ManualParameters
-              parameters={parameters}
-              onParametersChange={setParameters}
-            />
-          )}
-
-          {/* Analysis Results */}
-          {analysisResult && (
-            <AnalysisResults analysis={analysisResult} />
-          )}
-
-          {/* Strategy Selector */}
-          {recommendedStrategies.length > 0 && (
-            <StrategySelector
-              strategies={recommendedStrategies}
-              selectedStrategy={selectedStrategy}
-              onStrategySelect={setSelectedStrategy}
-            />
-          )}
-
-          {/* Response Generator */}
-          {selectedStrategy && analyzedComment && (
-            <ResponseGenerator
-              comment={analyzedComment}
-              strategy={selectedStrategy}
-              contextInfo={contextInfo}
-            />
-          )}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <Card key={index} className="shadow-apple">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+                    <p className="text-2xl font-bold" style={{ color: stat.color }}>
+                      {stat.value}
+                    </p>
+                    <p className="text-xs text-gray-500">{stat.change} seit gestern</p>
+                  </div>
+                  <div 
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: `${stat.color}20` }}
+                  >
+                    <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
 
-      {/* Context Modal */}
-      {showContextModal && (
-        <ContextModal
-          isOpen={showContextModal}
-          onClose={() => setShowContextModal(false)}
-          onSave={(context) => {
-            setContextInfo(context);
-            setShowContextModal(false);
-          }}
-        />
-      )}
+        {/* Quick Actions */}
+        <Card className="shadow-apple mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5" style={{ color: '#9C2C63' }} />
+              Schnellaktionen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {quickActions.map((action, index) => (
+                <Link key={index} href={action.path}>
+                  <Card className="cursor-pointer hover:shadow-apple-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <CardContent className="p-6 text-center">
+                      <div 
+                        className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                        style={{ background: action.gradient }}
+                      >
+                        <action.icon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="font-semibold mb-2" style={{ color: '#4B0F2E' }}>
+                        {action.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{action.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Loading Indicator */}
-      {isLoading && <LoadingIndicator />}
+        {/* Recent Analyses */}
+        <Card className="shadow-apple">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5" style={{ color: '#367E6B' }} />
+                Letzte Analysen
+              </div>
+              <Link href="/history">
+                <Button variant="ghost" size="sm">
+                  Alle anzeigen
+                </Button>
+              </Link>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentAnalyses.map((analysis) => (
+                <div key={analysis.id} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="text-2xl">{getPlatformEmoji(analysis.platform)}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-800 truncate">
+                        "{analysis.content}"
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500">{analysis.platform}</span>
+                        <span className="text-xs text-gray-400">•</span>
+                        <span className="text-xs text-gray-500">{analysis.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge 
+                      variant="outline"
+                      style={{ 
+                        borderColor: getRiskColor(analysis.riskLevel),
+                        color: getRiskColor(analysis.riskLevel)
+                      }}
+                    >
+                      {analysis.riskScore}/10
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

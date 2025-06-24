@@ -38,35 +38,53 @@ export class MemStorage implements IStorage {
     const predefinedStrategies: Omit<Strategy, 'id'>[] = [
       {
         name: "Deeskalation",
-        description: "Ruhige, sachliche Antwort die zur Beruhigung der Situation beiträgt",
-        icon: "fas fa-dove",
+        description: "Beruhigt die Situation und reduziert Spannungen durch ruhige, verständnisvolle Kommunikation.",
+        icon: "🕊️",
         category: "defensive",
         pros: ["Vermeidet weitere Eskalation", "Professionelle Reaktion", "Bewahrt Ruhe"],
         cons: ["Könnte als Schwäche interpretiert werden", "Langsamere Konfliktlösung"],
         riskLevel: "low"
       },
       {
-        name: "Direkte Konfrontation",
-        description: "Klare Grenzen setzen und das Verhalten direkt ansprechen",
-        icon: "fas fa-shield",
-        category: "assertive",
-        pros: ["Klare Kommunikation", "Setzt Grenzen", "Zeigt Stärke"],
-        cons: ["Kann Konflikt verstärken", "Erhöhte Emotionalität", "Unvorhersagbare Reaktion"],
-        riskLevel: "high"
-      },
-      {
         name: "Ignorieren",
-        description: "Keine Reaktion zeigen und dem Angreifer keine Aufmerksamkeit schenken",
-        icon: "fas fa-eye-slash",
+        description: "Keine Reaktion zeigen und dem Angreifer ins Leere laufen lassen.",
+        icon: "🚫",
         category: "passive",
         pros: ["Entzieht Aufmerksamkeit", "Vermeidet Eskalation", "Emotionale Distanz"],
         cons: ["Könnte Verhalten verstärken", "Keine Problemlösung", "Mögliche Eskalation"],
         riskLevel: "medium"
       },
       {
-        name: "Humor/Ironie",
-        description: "Mit Humor oder Ironie antworten um die Situation zu entschärfen",
-        icon: "fas fa-smile",
+        name: "Direkte Konfrontation",
+        description: "Klare Grenzen setzen und sich selbstbewusst zur Wehr setzen.",
+        icon: "⚔️",
+        category: "assertive",
+        pros: ["Klare Kommunikation", "Setzt Grenzen", "Zeigt Stärke"],
+        cons: ["Kann Konflikt verstärken", "Erhöhte Emotionalität", "Unvorhersagbare Reaktion"],
+        riskLevel: "high"
+      },
+      {
+        name: "Dokumentieren",
+        description: "Screenshots und Beweise sammeln für spätere rechtliche oder disziplinarische Schritte.",
+        icon: "📝",
+        category: "informative",
+        pros: ["Rechtliche Absicherung", "Professioneller Ansatz", "Langfristige Lösung"],
+        cons: ["Keine sofortige Hilfe", "Zeitaufwendig", "Erfordert Mut"],
+        riskLevel: "low"
+      },
+      {
+        name: "Hilfe holen",
+        description: "Vertrauenspersonen, Beratungsstellen oder Autoritäten um Unterstützung bitten.",
+        icon: "🆘",
+        category: "supportive",
+        pros: ["Professionelle Unterstützung", "Geteilte Verantwortung", "Expertise"],
+        cons: ["Abhängigkeit von anderen", "Mögliche Verzögerung", "Verlust der Kontrolle"],
+        riskLevel: "low"
+      },
+      {
+        name: "Humor/Deflection",
+        description: "Mit Humor oder Ironie antworten um die Situation zu entschärfen.",
+        icon: "😄",
         category: "deflective",
         pros: ["Entschärft Situation", "Zeigt Gelassenheit", "Kann Sympathie erzeugen"],
         cons: ["Kann missverstanden werden", "Risiko der Verharmlosung", "Timing wichtig"],
@@ -74,8 +92,8 @@ export class MemStorage implements IStorage {
       },
       {
         name: "Sachliche Korrektur",
-        description: "Faktische Fehler korrigieren ohne emotional zu werden",
-        icon: "fas fa-check-circle",
+        description: "Faktische Fehler korrigieren ohne emotional zu werden.",
+        icon: "✅",
         category: "informative",
         pros: ["Stellt Fakten klar", "Professionell", "Bildend"],
         cons: ["Kann als belehrend wirken", "Ignoriert emotionale Ebene", "Möglicherweise wirkungslos"],
@@ -83,8 +101,8 @@ export class MemStorage implements IStorage {
       },
       {
         name: "Empathische Reaktion",
-        description: "Verständnis für mögliche Gründe des Verhaltens zeigen",
-        icon: "fas fa-heart",
+        description: "Verständnis für mögliche Gründe des Verhaltens zeigen.",
+        icon: "❤️",
         category: "empathetic",
         pros: ["Zeigt Menschlichkeit", "Kann Aggression reduzieren", "Fördert Dialog"],
         cons: ["Kann als Schwäche interpretiert werden", "Rechtfertigt möglicherweise Verhalten", "Emotional belastend"],
@@ -105,6 +123,8 @@ export class MemStorage implements IStorage {
       id,
       analysis: null,
       parameters: insertComment.parameters || null,
+      title: insertComment.title || null,
+      platform: insertComment.platform || null,
       createdAt: new Date(),
     };
     this.comments.set(id, comment);

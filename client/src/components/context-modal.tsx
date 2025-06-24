@@ -37,7 +37,7 @@ export default function ContextModal({ isOpen, onClose, onSave }: ContextModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-apple-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Kontext-Informationen
@@ -107,7 +107,11 @@ export default function ContextModal({ isOpen, onClose, onSave }: ContextModalPr
             <Button variant="ghost" onClick={handleCancel}>
               Abbrechen
             </Button>
-            <Button onClick={handleSave} className="bg-primary text-white hover:bg-blue-600">
+            <Button 
+              onClick={handleSave} 
+              className="text-white"
+              style={{ background: 'linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)' }}
+            >
               Speichern
             </Button>
           </div>
