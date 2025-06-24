@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Brain, TrendingUp, AlertTriangle, Shield, Zap, History, BookOpen } from "lucide-react";
 import { Link } from "wouter";
+import QuickScan from "@/components/quick-scan";
 
 export default function Dashboard() {
   const stats = [

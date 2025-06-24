@@ -34,13 +34,23 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="flex min-h-screen bg-gray-50">
-          {/* Sidebar */}
+          {/* Desktop Sidebar */}
           <div className="hidden md:block">
             <Sidebar isOpen={true} onClose={() => {}} />
           </div>
           
-          {/* Mobile Sidebar */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          {/* Mobile Sidebar with Backdrop */}
+          {sidebarOpen && (
+            <>
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                onClick={() => setSidebarOpen(false)}
+              />
+              <div className="md:hidden">
+                <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+              </div>
+            </>
+          )}
           
           {/* Main Content */}
           <div className="flex-1 flex flex-col min-w-0">
@@ -49,13 +59,13 @@ function App() {
               <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
                 <Menu className="w-5 h-5" />
               </Button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full" style={{ background: 'linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)' }}>
-                  <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)' }}></div>
-                  </div>
-                </div>
-                <span className="font-semibold" style={{ color: '#4B0F2E' }}>ReactSafe</span>
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/attached_assets/ChatGPT Image 24. Juni 2025, 15_59_21_1750775108523.png" 
+                  alt="ReactSafe Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                <span className="font-semibold" style={{ color: '#367E6B' }}>ReactSafe</span>
               </div>
             </div>
             

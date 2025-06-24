@@ -12,16 +12,43 @@ export async function analyzeCyberbullyingComment(
   context?: ContextInfo
 ): Promise<AnalysisResult> {
   try {
-    const systemPrompt = `You are an expert in cyberbullying detection, linguistic analysis, and communication theory. Analyze the given comment for cyberbullying indicators and provide a comprehensive assessment.
+    const systemPrompt = `Du bist ein Experte für tiefgreifende linguistische Cybermobbing-Analyse mit Schwerpunkt auf pragmatischer, semantischer und syntaktischer Ebene.
 
-Consider the following aspects:
-1. Linguistic patterns (negative language, aggressive words, emotional intensity)
-2. Cyberbullying indicators (degradation, isolation attempts, power imbalance)
-3. Communication theory aspects (tone, intention, escalation potential)
+TIEFE LINGUISTISCHE ANALYSE:
 
-Provide analysis scores and classifications. Recommend appropriate communication strategies based on the analysis.
+1. PRAGMATISCHE EBENE:
+- Sprechakte: Welche Handlungen werden durch Sprache vollzogen? (Drohen, Beschämen, Ausschließen, Beleidigen)
+- Implikaturen: Was wird indirekt kommuniziert? Welche versteckten Botschaften?
+- Präsuppositionen: Welche Annahmen werden vorausgesetzt?
+- Face-threatening acts: Welche Gesichtsverluste werden verursacht?
 
-Respond with JSON in this exact format:
+2. SEMANTISCHE EBENE:
+- Denotative vs. konnotative Bedeutungen
+- Metaphorische und metonymische Strukturen
+- Euphemismen vs. Dysphemismen
+- Emotional aufgeladene Lexik
+- Wortfeld-Analyse
+
+3. SYNTAKTISCHE MUSTER:
+- Satztypen (Imperative = Befehle, Interrogative = rhetorische Fragen)
+- Modalverben und ihre Machtwirkung
+- Intensivierungen und Abschwächungen
+- Ellipsen und ihre Wirkung
+
+4. DISKURSSTRATEGIEN:
+- Othering-Mechanismen (Wir vs. Die)
+- Delegitimierungsstrategien
+- Macht- und Dominanzstrukturen
+- Ausschlussrhetorik
+
+5. PSYCHOLINGUISTISCHE WIRKUNG:
+- Emotionale Manipulation
+- Kognitive Verzerrungen
+- Identitätsgefährdende Aussagen
+
+${context ? `KONTEXT: Beziehung: ${context.relationship}, Gewünschte Reaktion: ${context.desiredReaction}` : ''}
+
+Antworte im JSON-Format:
 {
   "riskScore": number (0-10),
   "riskLevel": "low" | "medium" | "high",
@@ -42,7 +69,37 @@ Respond with JSON in this exact format:
       "escalationPotential": "low" | "medium" | "high"
     }
   },
-  "recommendedStrategies": [strategy_ids as numbers]
+  "recommendedStrategies": [strategy_ids as numbers],
+  "linguisticAnalysis": {
+    "pragmatic": {
+      "speechActs": [string],
+      "implicatures": [string],
+      "presuppositions": [string],
+      "faceThreat": "low" | "medium" | "high"
+    },
+    "semantic": {
+      "keyWords": [string],
+      "metaphors": [string],
+      "connotations": [string],
+      "emotionalLoad": number (0-100)
+    },
+    "syntactic": {
+      "sentenceTypes": [string],
+      "modalVerbs": [string],
+      "intensifiers": [string],
+      "complexity": "simple" | "medium" | "complex"
+    },
+    "discourse": {
+      "strategies": [string],
+      "powerDynamics": string,
+      "exclusionMechanisms": [string]
+    },
+    "psycholinguistic": {
+      "manipulationTactics": [string],
+      "identityThreats": [string],
+      "emotionalImpact": string
+    }
+  }
 }`;
 
     let userPrompt = `Analyze this comment: "${comment}"`;

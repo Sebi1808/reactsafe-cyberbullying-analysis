@@ -38,15 +38,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Header with ReactSafe Logo */}
         <div className="flex items-center space-x-3 p-6 border-b border-gray-100">
           <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full" style={{ background: 'linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)' }}>
-                <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                  <div className="w-4 h-4 rounded-sm" style={{ background: 'linear-gradient(135deg, #9C2C63 0%, #78C2AD 100%)' }}></div>
-                </div>
-              </div>
+            <div className="relative w-10 h-10">
+              <img 
+                src="/attached_assets/ChatGPT Image 24. Juni 2025, 15_59_21_1750775108523.png" 
+                alt="ReactSafe Logo" 
+                className="w-10 h-10 object-contain"
+              />
             </div>
             <div>
-              <h1 className="text-lg font-semibold" style={{ color: '#4B0F2E' }}>ReactSafe</h1>
+              <h1 className="text-lg font-semibold" style={{ color: '#367E6B' }}>ReactSafe</h1>
               <p className="text-xs text-gray-500">AI-Powered Protection</p>
             </div>
           </div>

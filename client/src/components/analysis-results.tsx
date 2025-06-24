@@ -149,6 +149,9 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Tiefe Linguistische Analyse */}
+      <LinguisticAnalysisDisplay analysis={analysis} />
     </div>
   );
 }

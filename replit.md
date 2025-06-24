@@ -1,8 +1,8 @@
-# CyberGuard - Cyberbullying Analysis & Response System
+# ReactSafe - Cyberbullying Analysis & Response System
 
 ## Overview
 
-CyberGuard is a full-stack web application designed to analyze cyberbullying comments using AI and provide strategic response recommendations. The system offers both manual parameter configuration and autopilot modes for comment analysis, with intelligent response generation based on selected communication strategies.
+ReactSafe is a full-stack web application designed to analyze cyberbullying comments using AI and provide strategic response recommendations. The system offers both manual parameter configuration and autopilot modes for comment analysis, with intelligent response generation based on selected communication strategies. Features deep linguistic analysis on pragmatic, semantic, and syntactic levels with German interface.
 
 ## System Architecture
 
@@ -99,6 +99,12 @@ CyberGuard is a full-stack web application designed to analyze cyberbullying com
 ✓ Mobile-first responsive design with improved animations
 ✓ Tab-based analysis interface with automatic strategy generation
 ✓ Updated color scheme using brand colors: Brombeer (#4B0F2E, #9C2C63), Minze (#C0E8D5, #78C2AD, #367E6B)
+✓ PostgreSQL database integration with persistent storage
+✓ Quick Scan functionality with real-time analysis
+✓ Deep linguistic analysis on multiple levels (pragmatic, semantic, syntactic, discourse, psycholinguistic)
+✓ Fixed double menu problem and improved mobile navigation
+✓ Integrated authentic ReactSafe logo with gradient colors
+✓ Database functions activated with strategy management
 
 ## User Preferences
 

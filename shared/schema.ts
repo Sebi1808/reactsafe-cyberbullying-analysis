@@ -85,6 +85,36 @@ export const analysisResultSchema = z.object({
     }),
   }),
   recommendedStrategies: z.array(z.number()),
+  linguisticAnalysis: z.object({
+    pragmatic: z.object({
+      speechActs: z.array(z.string()),
+      implicatures: z.array(z.string()),
+      presuppositions: z.array(z.string()),
+      faceThreat: z.enum(['low', 'medium', 'high']),
+    }),
+    semantic: z.object({
+      keyWords: z.array(z.string()),
+      metaphors: z.array(z.string()),
+      connotations: z.array(z.string()),
+      emotionalLoad: z.number().min(0).max(100),
+    }),
+    syntactic: z.object({
+      sentenceTypes: z.array(z.string()),
+      modalVerbs: z.array(z.string()),
+      intensifiers: z.array(z.string()),
+      complexity: z.enum(['simple', 'medium', 'complex']),
+    }),
+    discourse: z.object({
+      strategies: z.array(z.string()),
+      powerDynamics: z.string(),
+      exclusionMechanisms: z.array(z.string()),
+    }),
+    psycholinguistic: z.object({
+      manipulationTactics: z.array(z.string()),
+      identityThreats: z.array(z.string()),
+      emotionalImpact: z.string(),
+    }),
+  }).optional(),
 });
 
 // Types
