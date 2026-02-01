@@ -6,11 +6,11 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
-}
+// Replit auth is optional for Vercel deployments
+const isReplitEnv = !!process.env.REPLIT_DOMAINS;
 
 const getOidcConfig = memoize(
   async () => {
@@ -68,6 +68,40 @@ async function upsertUser(
 
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
+  
+  // Only setup Replit auth if REPLIT_DOMAINS is set
+  if (!isReplitEnv) {
+    // For Vercel deployments without Replit auth, use a simple session store
+    const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+    const MemoryStoreSession = MemoryStore(session);
+    app.use(session({
+      secret: process.env.SESSION_SECRET || "default-secret-change-in-production",
+      store: new MemoryStoreSession({
+        checkPeriod: 86400000, // prune expired entries every 24h
+      }),
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: sessionTtl,
+      },
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    
+    // Provide stub auth endpoints
+    app.get("/api/login", (_req, res) => {
+      res.json({ message: "Auth not configured for this deployment" });
+    });
+    
+    app.get("/api/logout", (_req, res) => {
+      res.json({ message: "Logged out" });
+    });
+    
+    return;
+  }
+
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
