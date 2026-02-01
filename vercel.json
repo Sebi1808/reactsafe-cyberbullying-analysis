@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/analyze", "destination": "/api/analyze" },
+    { "source": "/api/generate-response", "destination": "/api/generate-response" },
+    { "source": "/api/strategies", "destination": "/api/strategies" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+

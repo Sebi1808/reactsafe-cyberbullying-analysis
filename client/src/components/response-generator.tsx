@@ -22,7 +22,7 @@ export default function ResponseGenerator({ comment, strategy, contextInfo }: Re
   const handleGenerate = async () => {
     try {
       const result = await generateResponseMutation.mutateAsync({
-        commentId: comment.id,
+        comment: comment.content,
         strategyId: strategy.id,
         context: contextInfo || undefined,
       });

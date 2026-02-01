@@ -5,7 +5,7 @@ import { Shield, Brain, Users, Zap, CheckCircle, ArrowRight } from "lucide-react
 
 export default function LandingPage() {
   const handleLogin = () => {
-    window.location.href = '/api/login';
+    window.location.href = '/';
   };
 
   const features = [
@@ -88,7 +88,7 @@ export default function LandingPage() {
             size="lg"
             className="bg-gradient-to-r from-[#9C2C63] to-[#367E6B] hover:from-[#4B0F2E] hover:to-[#78C2AD] text-white px-8 py-6 text-lg"
           >
-            Mit Replit anmelden
+            Jetzt starten
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>

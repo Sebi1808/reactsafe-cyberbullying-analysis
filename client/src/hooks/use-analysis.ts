@@ -16,7 +16,7 @@ interface AnalyzeCommentResponse {
 }
 
 interface GenerateResponseRequest {
-  commentId: number;
+  comment: string;
   strategyId: number;
   context?: ContextInfo;
 }
